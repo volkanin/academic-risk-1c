@@ -21,12 +21,8 @@ from __future__ import annotations
 
 import csv
 import io
-import os
 import re
 from pathlib import Path
-
-import psycopg2
-from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[1]
 SYNTHETIC_DIR = ROOT / "data" / "raw" / "synthetic"
@@ -54,16 +50,7 @@ OULAD_FILES = {
     "oulad_student_vle": "studentVle.csv",
 }
 
-
-def connect():
-    load_dotenv(ROOT / ".env")
-    return psycopg2.connect(
-        host=os.getenv("POSTGRES_HOST", "localhost"),
-        port=os.getenv("POSTGRES_PORT", "5432"),
-        dbname=os.getenv("POSTGRES_DB", "academic_risk"),
-        user=os.getenv("POSTGRES_USER"),
-        password=os.getenv("POSTGRES_PASSWORD"),
-    )
+from utils.db import connect  # noqa: E402  (общее подключение, sys.path указывает на src)
 
 
 def apply_schema(conn) -> None:
