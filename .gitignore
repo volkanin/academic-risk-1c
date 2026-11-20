@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Данные: в репозитории лежат только .gitkeep и мелкие samples
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Выгрузка конфигурации 1С: десятки тысяч XML, в историю не попадает
+config/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Артефакты моделей (файлы моделей выгружаются локально, код загрузки в репозитории)
+*.joblib
+*.pkl
+*.onnx
+
+# Тесты и покрытие
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Docker
+pgdata/
+
+# ОС и редакторы
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

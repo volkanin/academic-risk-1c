@@ -1,0 +1,23 @@
+# Основной стек проекта. Версии будут зафиксированы после экспериментов (блок 3.3 требований)
+pandas
+numpy
+scikit-learn
+catboost
+matplotlib
+seaborn
+jupyter
+psycopg2-binary
+sqlalchemy
+redis
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+httpx
+confluent-kafka
+shap
+optuna
+joblib
+python-dotenv
+pytest
+pytest-cov
