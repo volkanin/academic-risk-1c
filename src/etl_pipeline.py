@@ -59,16 +59,16 @@ def apply_schema(conn) -> None:
     conn.commit()
 
 
-def load_rows(conn, table: str, header: list[str], rows: list[list[str]]) -> int:
+def load_rows(conn, table: str, header: list[str], rows: list[list[str]], schema: str = "raw") -> int:
     """Загрузка пачки строк через COPY (формат csv, пустая строка = NULL)."""
     buf = io.StringIO()
     writer = csv.writer(buf)
     writer.writerows(rows)
     buf.seek(0)
-    return copy_stream(conn, table, header, buf)
+    return copy_stream(conn, table, header, buf, schema=schema)
 
 
-def copy_stream(conn, table: str, header: list[str], stream) -> int:
+def copy_stream(conn, table: str, header: list[str], stream, schema: str = "raw") -> int:
     """COPY из открытого текстового потока; возвращает число загруженных строк.
 
     Поток должен указывать на первую строку данных: заголовок из файла
@@ -76,18 +76,18 @@ def copy_stream(conn, table: str, header: list[str], stream) -> int:
     """
     cols = ", ".join(h if h.isidentifier() else f'"{h}"' for h in header)
     with conn.cursor() as cur:
-        cur.execute(f"TRUNCATE TABLE raw.{table}")
+        cur.execute(f"TRUNCATE TABLE {schema}.{table}")
         cur.copy_expert(
-            f"COPY raw.{table} ({cols}) FROM STDIN WITH (FORMAT csv, NULL '')",
+            f"COPY {schema}.{table} ({cols}) FROM STDIN WITH (FORMAT csv, NULL '')",
             stream,
         )
     conn.commit()
-    return count_rows(conn, table)
+    return count_rows(conn, table, schema=schema)
 
 
-def count_rows(conn, table: str) -> int:
+def count_rows(conn, table: str, schema: str = "raw") -> int:
     with conn.cursor() as cur:
-        cur.execute(f"SELECT count(*) FROM raw.{table}")
+        cur.execute(f"SELECT count(*) FROM {schema}.{table}")
         return cur.fetchone()[0]
 
 
