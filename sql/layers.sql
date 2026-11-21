@@ -222,11 +222,18 @@ CREATE TABLE IF NOT EXISTS cleaned.vs_students (
     region         text,
     hostel         boolean,
     privilege      boolean,
+    study_form     text,
+    basis          text,
     admission_year integer,
     admission_date date
 );
 TRUNCATE TABLE cleaned.vs_students;
-INSERT INTO cleaned.vs_students SELECT student_id, program_id, group_code, gender, birth_date, region, hostel, privilege, admission_year, admission_date FROM raw.vs_students;
+ALTER TABLE cleaned.vs_students ADD COLUMN IF NOT EXISTS study_form text;
+ALTER TABLE cleaned.vs_students ADD COLUMN IF NOT EXISTS basis text;
+INSERT INTO cleaned.vs_students
+    (student_id, program_id, group_code, gender, birth_date, region, hostel, privilege, study_form, basis, admission_year, admission_date)
+SELECT student_id, program_id, group_code, gender, birth_date, region, hostel, privilege, study_form, basis, admission_year, admission_date
+FROM raw.vs_students;
 
 CREATE TABLE IF NOT EXISTS cleaned.vs_disciplines (
     discipline_id text NOT NULL,

@@ -39,9 +39,14 @@ import csv
 import json
 import math
 import random
+import sys
 import uuid
 from datetime import date, timedelta
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from utils.calendar import semester_dates, session_window
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "data" / "raw" / "synthetic"
@@ -88,19 +93,6 @@ def sigmoid(x: float) -> float:
 
 def clamp(x: float, low: float, high: float) -> float:
     return max(low, min(high, x))
-
-
-def semester_dates(admission_year: int, semester_no: int) -> tuple[date, date]:
-    """Календарь семестра: нечётные осень, чётные весна."""
-    y = admission_year + (semester_no - 1) // 2
-    if semester_no % 2 == 1:
-        return date(y, 9, 1), date(y, 12, 28)
-    return date(y + 1, 2, 5), date(y + 1, 6, 15)
-
-
-def session_window(end: date) -> tuple[date, date]:
-    """Окно сессии: последние три недели семестра."""
-    return end - timedelta(days=20), end - timedelta(days=2)
 
 
 def grade_pass_score(rng: random.Random, ability: float) -> int:
@@ -208,6 +200,8 @@ def main() -> None:
                 "region": region,
                 "hostel": "true" if (region != "регион вуза" and rng.random() < 0.6) else "false",
                 "privilege": "true" if rng.random() < 0.08 else "false",
+                "study_form": study_form,
+                "basis": basis,
                 "admission_year": year,
                 "admission_date": admission_date.isoformat(),
             })
@@ -460,7 +454,7 @@ def main() -> None:
     }
     headers = {
         "vs_programs": ["program_id", "title", "faculty", "study_form", "basis"],
-        "vs_students": ["student_id", "program_id", "group_code", "gender", "birth_date", "region", "hostel", "privilege", "admission_year", "admission_date"],
+        "vs_students": ["student_id", "program_id", "group_code", "gender", "birth_date", "region", "hostel", "privilege", "study_form", "basis", "admission_year", "admission_date"],
         "vs_disciplines": ["discipline_id", "title", "program_id", "semester", "control_type", "credits"],
         "vs_admission": ["student_id", "exam_score", "previous_education", "priority", "medal"],
         "vs_movements": ["student_id", "order_type", "reason", "order_date", "effective_date", "entered_at"],

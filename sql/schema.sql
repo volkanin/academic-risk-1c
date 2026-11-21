@@ -88,9 +88,15 @@ CREATE TABLE IF NOT EXISTS raw.vs_students (
     region         text,
     hostel         boolean,
     privilege      boolean,
+    study_form     text,
+    basis          text,
     admission_year integer,
     admission_date date
 );
+
+-- Эволюция схемы: идемпотентное добавление колонок при изменении структуры витрин.
+ALTER TABLE raw.vs_students ADD COLUMN IF NOT EXISTS study_form text;
+ALTER TABLE raw.vs_students ADD COLUMN IF NOT EXISTS basis text;
 
 CREATE TABLE IF NOT EXISTS raw.vs_disciplines (
     discipline_id text NOT NULL,
