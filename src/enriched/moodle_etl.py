@@ -127,12 +127,15 @@ def semester_week(adm_year: int, sem_max: int, day: date) -> tuple[int, int] | N
     return current, (day - start).days // 7 + 1
 
 
-def build_student_map(client: MoodleClient, salt: str, conn) -> int:
+def build_student_map(client: MoodleClient, salt: str, conn, course_ids=None) -> int:
     """Заполнить enriched.student_map по участникам курсов Moodle.
 
     Студент связывается, если его логин (зачётка) найден в 1С-контингенте.
+    course_ids ограничивает выборку указанными курсами.
     """
     courses = client.call("core_course_get_courses")
+    if course_ids:
+        courses = [c for c in courses if c["id"] in course_ids]
     usernames = set()
     for course in courses:
         for user in client.call("core_enrol_get_enrolled_users", courseid=course["id"]):
@@ -159,12 +162,15 @@ def build_student_map(client: MoodleClient, salt: str, conn) -> int:
     return matched
 
 
-def collect_activity(client: MoodleClient, salt: str, conn) -> dict:
+def collect_activity(client: MoodleClient, salt: str, conn, limit_courses: int | None = None,
+                     course_ids: set[int] | None = None, verbose: bool = False) -> dict:
     """Выгрузить активность по курсам и собрать действия по псевдонимам.
 
     Действия (сдача работы, попытка теста, сообщение на форуме) связываются
     со студентами только через хеш логина; идентификатор пользователя Moodle
-    служебный и в enriched не попадает.
+    служебный и в enriched не попадает. limit_courses ограничивает число
+    курсов для пробного прогона. Ошибка на одном курсе пропускает курс,
+    не прерывая выгрузку.
     """
     with conn.cursor() as cur:
         cur.execute(
@@ -176,6 +182,7 @@ def collect_activity(client: MoodleClient, salt: str, conn) -> dict:
 
     moodle_usernames: dict[int, str] = {}
     enrolled_users: set[int] = set()
+    entered_users: set[int] = set()
     active_users: set[int] = set()
     events_by_student: dict[str, list[tuple[date, int]]] = defaultdict(list)
     grades: dict[str, int] = defaultdict(int)
@@ -194,59 +201,73 @@ def collect_activity(client: MoodleClient, salt: str, conn) -> dict:
             events_by_student[h].append((day, course_id))
 
     courses = client.call("core_course_get_courses")
+    if course_ids:
+        courses = [c for c in courses if c["id"] in course_ids]
+    if limit_courses:
+        courses = courses[:limit_courses]
     n_events = 0
+    n_failed = 0
     for course in courses:
         course_id = course["id"]
-        for user in client.call("core_enrol_get_enrolled_users", courseid=course_id):
-            if user.get("username"):
-                moodle_usernames[user["id"]] = username_hash(salt, user["username"])
-            enrolled_users.add(user["id"])
+        try:
+            for user in client.call("core_enrol_get_enrolled_users", courseid=course_id):
+                if user.get("username"):
+                    moodle_usernames[user["id"]] = username_hash(salt, user["username"])
+                enrolled_users.add(user["id"])
+                if user.get("lastcourseaccess"):
+                    entered_users.add(user["id"])
 
-        # Сданные работы: время сдачи.
-        assignments = client.call("mod_assign_get_assignments", courseids=[course_id])
-        for course_block in assignments.get("courses", []):
-            for task in course_block.get("assignments", []):
-                sub = client.call("mod_assign_get_submissions", assignmentids=[task["id"]])
-                for block in sub.get("assignments", []):
-                    for item in block.get("submissions", []):
-                        submissions[moodle_usernames.get(item.get("userid"))] += 1
-                        add_action(item.get("timemodified"), item.get("userid"), course_id)
-                        n_events += 1
+            # Сданные работы: время сдачи.
+            assignments = client.call("mod_assign_get_assignments", courseids=[course_id])
+            for course_block in assignments.get("courses", []):
+                for task in course_block.get("assignments", []):
+                    sub = client.call("mod_assign_get_submissions", assignmentids=[task["id"]])
+                    for block in sub.get("assignments", []):
+                        for item in block.get("submissions", []):
+                            submissions[moodle_usernames.get(item.get("userid"))] += 1
+                            add_action(item.get("timemodified"), item.get("userid"), course_id)
+                            n_events += 1
 
-        # Попытки тестов: время завершения.
-        quizzes = client.call("mod_quiz_get_quizzes_by_courses", courseids=[course_id])
-        quiz_ids = []
-        for quiz_block in quizzes.get("quizzes", []):
-            quiz_ids += [q["id"] for q in quiz_block.get("quizzes", [])]
-        if quiz_ids:
-            attempts_data = client.call("mod_quiz_get_user_attempts", quizids=quiz_ids)
-            for attempt in attempts_data.get("attempts", []):
-                attempts[moodle_usernames.get(attempt.get("userid"))] += 1
-                add_action(attempt.get("timefinish") or attempt.get("timestart"),
-                           attempt.get("userid"), course_id)
-                n_events += 1
-
-        # Обсуждения на форумах: создание и последний ответ.
-        forums = client.call("mod_forum_get_forums_by_courses", courseids=[course_id])
-        for forum in forums:
-            data = client.call("mod_forum_get_forum_discussions", forumid=forum["id"])
-            for d in data.get("discussions", []):
-                discussions[moodle_usernames.get(d.get("userid"))] += 1
-                add_action(d.get("created"), d.get("userid"), course_id)
-                if d.get("timemodified") and d.get("timemodified") != d.get("created"):
-                    add_action(d.get("timemodified"), d.get("usermodified"), course_id)
+            # Попытки тестов: время завершения.
+            quizzes = client.call("mod_quiz_get_quizzes_by_courses", courseids=[course_id])
+            quiz_ids = []
+            for quiz_block in quizzes.get("quizzes", []):
+                quiz_ids += [q["id"] for q in quiz_block.get("quizzes", [])]
+            if quiz_ids:
+                attempts_data = client.call("mod_quiz_get_user_attempts", quizids=quiz_ids)
+                for attempt in attempts_data.get("attempts", []):
+                    attempts[moodle_usernames.get(attempt.get("userid"))] += 1
+                    add_action(attempt.get("timefinish") or attempt.get("timestart"),
+                               attempt.get("userid"), course_id)
                     n_events += 1
-                n_events += 1
 
-        # Оценки: счётчик элементов без времени.
-        grades_data = client.call("gradereport_user_get_grade_items", courseid=course_id)
-        for user_grades in grades_data.get("usergrades", []):
-            h = moodle_usernames.get(user_grades.get("userid"))
-            if h in students:
-                grades[h] += len(user_grades.get("gradeitems", []))
+            # Обсуждения на форумах: создание и последний ответ.
+            forums = client.call("mod_forum_get_forums_by_courses", courseids=[course_id])
+            for forum in forums:
+                data = client.call("mod_forum_get_forum_discussions", forumid=forum["id"])
+                for d in data.get("discussions", []):
+                    discussions[moodle_usernames.get(d.get("userid"))] += 1
+                    add_action(d.get("created"), d.get("userid"), course_id)
+                    if d.get("timemodified") and d.get("timemodified") != d.get("created"):
+                        add_action(d.get("timemodified"), d.get("usermodified"), course_id)
+                        n_events += 1
+                    n_events += 1
+
+            # Оценки: счётчик элементов без времени.
+            grades_data = client.call("gradereport_user_get_grade_items", courseid=course_id)
+            for user_grades in grades_data.get("usergrades", []):
+                h = moodle_usernames.get(user_grades.get("userid"))
+                if h in students:
+                    grades[h] += len(user_grades.get("gradeitems", []))
+        except (MoodleError, httpx.HTTPError) as error:
+            n_failed += 1
+            print(f"  курс {course_id} пропущен: {error}")
+        if verbose:
+            print(f"  курс {course_id} обработан ({len(events_by_student)} студентов с действиями)")
 
     return {
         "n_courses": len(courses),
+        "n_failed": n_failed,
         "n_events": n_events,
         "students": students,
         "events_by_student": events_by_student,
@@ -255,6 +276,7 @@ def collect_activity(client: MoodleClient, salt: str, conn) -> dict:
         "attempts": attempts,
         "discussions": discussions,
         "enrolled_users": enrolled_users,
+        "entered_users": entered_users,
         "active_users": active_users,
     }
 
@@ -333,9 +355,19 @@ def load_activity(summary: dict, conn) -> tuple[int, int]:
 def main() -> None:
     from dotenv import load_dotenv
 
+    def parse_ids(text: str) -> set[int]:
+        """Список идентификаторов курсов через запятую."""
+        return {int(x) for x in text.split(",") if x.strip()}
+
     parser = argparse.ArgumentParser(description="ETL Moodle по веб-службам")
     parser.add_argument("--mock", action="store_true",
                         help="демонстрационный контур против локального эмулятора")
+    parser.add_argument("--limit-courses", type=int,
+                        help="ограничить число курсов (пробный прогон)")
+    parser.add_argument("--course-ids", type=parse_ids,
+                        help="выгрузить только указанные курсы через запятую")
+    parser.add_argument("--verbose", action="store_true",
+                        help="печатать каждый обработанный курс")
     args = parser.parse_args()
 
     load_dotenv(ROOT / ".env")
@@ -366,10 +398,11 @@ def main() -> None:
         except MoodleError as error:
             print(f"связь установлена (информация о службе недоступна: {error})")
 
-        matched = build_student_map(client, salt, conn)
+        matched = build_student_map(client, salt, conn, course_ids=args.course_ids)
         print(f"связано студентов по логину-зачётке: {matched}")
 
-        summary = collect_activity(client, salt, conn)
+        summary = collect_activity(client, salt, conn, limit_courses=args.limit_courses,
+                                   course_ids=args.course_ids, verbose=args.verbose)
         n_weeks, n_agg = load_activity(summary, conn)
         with_active = len(summary["events_by_student"])
         print(f"курсов: {summary['n_courses']}, действий студентов контингента: {summary['n_events']}")
@@ -377,10 +410,12 @@ def main() -> None:
         coverage = f"{with_active / matched:.0%}" if matched else "-"
         print(f"покрытие активностью (замер через API): {coverage}")
         enrolled = len(summary["enrolled_users"])
+        entered = len(summary["entered_users"])
         active = len(summary["active_users"])
         if enrolled:
             print(f"пользователей Moodle на курсах: {enrolled}, "
-                  f"с событиями: {active} ({active / enrolled:.0%})")
+                  f"входили в курс: {entered} ({entered / enrolled:.0%}), "
+                  f"с действиями: {active} ({active / enrolled:.0%})")
     finally:
         conn.close()
         client.close()
