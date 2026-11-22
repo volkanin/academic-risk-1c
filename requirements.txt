@@ -21,3 +21,5 @@ joblib
 python-dotenv
 pytest
 pytest-cov
+
+beautifulsoup4

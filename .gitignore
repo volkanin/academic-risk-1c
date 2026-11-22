@@ -37,3 +37,9 @@ Thumbs.db
 .DS_Store
 .idea/
 .vscode/
+
+# Внешние сырые данные скрейпинга (в репозиторий не входят)
+data/external/
+
+# Мусор экспериментов CatBoost
+catboost_info/
