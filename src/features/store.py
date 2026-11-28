@@ -42,6 +42,9 @@ INT_COLUMNS = {
     "n_no_shows", "debts_open", "debts_closed", "debts_days_open",
     "overdue_max", "n_unpaid", "n_late_paid", "n_exams_planned",
     "leaves_taken", "target",
+    # поля потока событий (streaming/consumer.py)
+    "n_grade_events", "n_debt_open_events", "n_debt_closed_events",
+    "n_payment_events",
 }
 FLOAT_COLUMNS = {
     "gpa_mean", "gpa_last", "gpa_prev", "gpa_delta", "gpa_slope", "gpa_std",
@@ -181,11 +184,15 @@ def _to_redis(v) -> str:
 
 
 def _from_redis(column: str, v: str):
-    """Обратное приведение по типу колонки: пустая строка это NULL."""
+    """Обратное приведение по типу колонки: пустая строка это NULL.
+
+    Целые колонки при материализации могли быть записаны строкой с
+    дробной частью: колонки с пропусками pandas приводит к float64.
+    """
     if v == "":
         return None
     if column in INT_COLUMNS:
-        return int(v)
+        return int(float(v))
     if column in FLOAT_COLUMNS:
         return float(v)
     if column in BOOL_COLUMNS:
