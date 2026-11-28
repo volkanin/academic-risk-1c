@@ -43,7 +43,7 @@
     "on_leave",
     "leaves_taken"
   ],
-  "created": "2026-11-21T12:06:04",
+  "created": "2026-11-28T13:11:33",
   "train": "features.vs_student_semester, когорты поступления 2019-2022",
   "test": "когорта 2023 (out-of-time)",
   "metrics_test": {
