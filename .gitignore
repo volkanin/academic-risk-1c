@@ -43,3 +43,7 @@ data/external/
 
 # Мусор экспериментов CatBoost
 catboost_info/
+
+# Реестр баз 1C для навыков 1c-skills (может содержать пароли)
+.v8-project.json
+.v8-xsd/

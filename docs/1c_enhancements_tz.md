@@ -212,3 +212,27 @@ GET /mapping/students-books: пары студент и номер зачётн�
 - Разработка и отладка на тестовой копии; рабочая база только на чтение в непиковые часы (п. 8 ТЗ).
 - Персональные данные: ФИО, паспорта, адреса, контакты не выгружаются; связь по UUID; book_number только по защищённому каналу и не в логи (NFR-2, п. 9 ТЗ).
 - Обращения к метаданным типовой конфигурации сосредоточены в модуле-адаптере (базовая постановка, п. 4).
+
+## 9. Уточнения по итогам реализации
+
+Раздел добавлен после реализации расширения (src/1c_ext) и проверок на
+тестовой копии базы 28.11.2026. Действующий контракт каждого метода
+возвращает GET /schema; здесь перечислены отличия от разделов 2 и 3.
+
+| Метод | Отличие от постановки |
+|---|---|
+| dim/students | добавлены book_number (номер зачетной книжки) и state (справочное текущее состояние); admission_year и admission_date не выгружаются, дата зачисления выводится приемником из fact/movements |
+| dim/programs | добавлены year (учебный год плана) и hours_per_credit (норма часов в зачетной единице); поле basis отсутствует |
+| dim/disciplines | источник изменен: записи плана из документов учебных планов, а не регистр сведений (его ключ не связывается с документом). discipline_id это дисциплина справочника (тот же идентификатор, что в fact/grades), уникальность строки дает row_id. Наименование в поле discipline_title, вид нагрузки в load_type; добавлены unit, amount, credits |
+| fact/movements | добавлены order_kind (вид приказа), analytics (аналитика приказов, основание), program_id, group_code. Классификация отчислений выполняется приемником по analytics: docs/metadata-mapping.md, п. 4 |
+| fact/grades | добавлены book_number, program_id, discipline_title, control_type, event_id |
+| fact/debts | добавлены book_number, program_id, discipline_title, event_id_open |
+| fact/finance | добавлены contract_id, event_id; в тестовой базе данных нет, источник будет взят из базы бухгалтерии |
+| fact/load | n_course_projects заменено на n_course_works (курсовые работы и проекты вместе); добавлены n_disciplines, hours, hours_per_credit, credits_source (plan или calculated) |
+| events | параметр modifiedSince не реализован, отбор по дате события; в payload добавлено discipline_title |
+| scoring/batch | studentId это идентификатор элемента справочника ЗачетныеКниги; состав тела: calculationId, calculationDate, modelVersion, items с полями studentId, riskProbability, riskCategory, factors |
+| export/jobs | фоновая выгрузка не реализована, диапазон дат дробится на части приемником |
+
+Идентификаторы событий: grade:UUID ведомости:номер строки,
+debt-open:UUID ведомости:номер строки, debt-closed:UUID ведомости:номер
+строки, payment:UUID документа.

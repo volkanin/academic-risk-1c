@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ConfigDumpInfo xmlns="http://v8.1c.ru/8.3/xcf/dumpinfo" xmlns:xen="http://v8.1c.ru/8.3/xcf/enums" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" format="Hierarchical" version="2.20">
+	<ConfigVersions>
+		<Metadata name="CommonModule.АР_АдаптерМетаданных" id="2b87344a-398e-514d-9def-a465e7dd90c9" configVersion="cbf4cfe359e17d030e5df3fbbda08bea35253b37"/>
+		<Metadata name="CommonModule.АР_АдаптерМетаданных.Module" id="2b87344a-398e-514d-9def-a465e7dd90c9.0" configVersion="e957addb7c08fe8fba9208f4a65722168d849f6e"/>
+		<Metadata name="CommonModule.АР_Витрины" id="4ae01c25-7f12-5249-93e5-cd5721f74713" configVersion="27d8993d88974f4a4a2c60dd43b547d9b95200ee"/>
+		<Metadata name="CommonModule.АР_Витрины.Module" id="4ae01c25-7f12-5249-93e5-cd5721f74713.0" configVersion="f831001795a26a681b1bf9b4e6bed99bf77f922c"/>
+		<Metadata name="CommonModule.АР_Сервис" id="216a0dd8-206b-5bec-b880-ca1d54ad0cc0" configVersion="09d5aa3db20c7a6d34d93781c81f49b005eca600"/>
+		<Metadata name="CommonModule.АР_Сервис.Module" id="216a0dd8-206b-5bec-b880-ca1d54ad0cc0.0" configVersion="eb8cc6f2ba33134062edd45aeb5d14a2dd906b0c"/>
+		<Metadata name="CommonModule.АР_Сериализация" id="66c2564e-5bb5-5aa8-b317-1a48ba58775b" configVersion="068067bb71181013153705af355efc1232702cc9"/>
+		<Metadata name="CommonModule.АР_Сериализация.Module" id="66c2564e-5bb5-5aa8-b317-1a48ba58775b.0" configVersion="733d531230243f3db2bc091ba300ec900d190494"/>
+		<Metadata name="Configuration.АР_АналитикаРиска" id="a4582857-afb9-56ad-a6f3-c5dfe13799e2" configVersion="edee7a66a06ae336f21cdaf0194273898e881fa0"/>
+		<Metadata name="HTTPService.АР_Аналитика" id="fcec34a9-72c4-5a51-becf-85129d0e1179" configVersion="9f38ad9e60f598844eea95a3cb160b42a5a34d32">
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.scoringLatest" id="047d4cdc-ec23-5422-a8a1-939c866b5918"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.schema.Method.Получить" id="06657c04-fe2f-5779-91da-2dd4b748dc8e"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.movements.Method.Получить" id="079d88b1-bde4-5b58-b548-8baf4f8f7415"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.reference" id="102db156-0f60-5e89-bfb6-5b13708a8d13"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.mapping" id="183f0285-6d53-59c2-a748-3aa071f44316"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.health.Method.Получить" id="1de9d009-4bbb-5819-947b-507bb4a231e2"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.students.Method.Получить" id="250de40f-40fd-59ef-8ce9-a60cfbfb38cd"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.grades" id="3780fa00-c4b2-57c7-8788-189a72af27bf"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.disciplines" id="3cb345e2-c629-55f0-9c0f-af91e7411329"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.reference.Method.Получить" id="3f36571b-d4dc-50ff-88c6-a2d93e361597"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.disciplines.Method.Получить" id="49e4a7ab-b0e8-5a41-ae09-635c405c1850"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.scoringBatch.Method.Принять" id="6b16ba82-16f4-5525-a2c6-e000611ee056"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.grades.Method.Получить" id="725b472e-3a59-502d-b504-6081334f9a24"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.events" id="78a39817-d9a0-55e6-97af-6a5ef277c173"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.finance.Method.Получить" id="87d0ad75-bcd2-5144-839a-dbdc4a0b550d"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.events.Method.Получить" id="8a0e4c92-e9c8-5668-8068-20b58d0d08b2"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.movements" id="98f3f944-1dd1-5f67-8774-445ade90cc88"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.mapping.Method.Получить" id="ac131b8f-751e-50e8-b745-817dedaf8658"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.schema" id="b7a517f2-559c-5a3e-9dc2-cd12ddc7a941"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.load.Method.Получить" id="ba046e46-cc33-5286-b96e-17dd802ef878"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.finance" id="d5de7567-0b0a-5a76-a2d8-f8b2b7d9fd9d"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.scoringLatest.Method.Получить" id="d81e8ffc-eb51-5fe5-ab73-71d421ab1a28"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.debts" id="de472964-fc0b-5ade-9539-47f3e4e8674e"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.load" id="dee3e9ec-c249-5de0-b436-6b9538dcfbdc"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.programs.Method.Получить" id="e50cb6f5-5629-547e-abd7-1056072466a7"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.programs" id="eaceb506-7b96-5643-a13d-8e25304ec3e6"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.students" id="edff2323-099f-59c8-8ae8-0a26c35b9e0c"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.health" id="f9a41e63-5706-59d4-9fcc-909d0620a649"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.scoringBatch" id="fd2ee86d-1947-5a2b-8a47-768c48d4308f"/>
+			<Metadata name="HTTPService.АР_Аналитика.URLTemplate.debts.Method.Получить" id="fe57bf47-2e65-5a7e-a39e-a974b5a72f9b"/>
+		</Metadata>
+		<Metadata name="HTTPService.АР_Аналитика.Module" id="fcec34a9-72c4-5a51-becf-85129d0e1179.0" configVersion="950cc2339b57f75e810b809bda1bd433306a5f1d"/>
+		<Metadata name="InformationRegister.АР_ОценкиРиска" id="b22dfd92-a5bd-50ee-a787-6e1b35ebbd16" configVersion="e6c79cef5a2bf7687600c2b65f420b76c1cc7de3">
+			<Metadata name="InformationRegister.АР_ОценкиРиска.Resource.ВерсияМодели" id="0540cba4-00c3-519c-9b87-35251a815905"/>
+			<Metadata name="InformationRegister.АР_ОценкиРиска.Dimension.Расчет" id="1187bd5b-090a-5f84-ac57-a5b1b43c3d67"/>
+			<Metadata name="InformationRegister.АР_ОценкиРиска.Dimension.Студент" id="11ce9f22-ede8-59ec-8212-5cfe4fd49b42"/>
+			<Metadata name="InformationRegister.АР_ОценкиРиска.Resource.Категория" id="3dfc0db7-41b4-5442-9f92-a0f5da578e3f"/>
+			<Metadata name="InformationRegister.АР_ОценкиРиска.Resource.Вероятность" id="641f207b-d412-5e62-aaa2-f597d0446b92"/>
+			<Metadata name="InformationRegister.АР_ОценкиРиска.Resource.Факторы" id="7f9586e3-ace2-5ebf-97e1-e2a38a838f20"/>
+			<Metadata name="InformationRegister.АР_ОценкиРиска.Dimension.ДатаРасчета" id="9eb8829e-2f90-5b24-87b2-5629ce137c2c"/>
+		</Metadata>
+		<Metadata name="Language.Русский" id="5d3b7c1e-8a42-4f96-b0d7-2c6e9a1f4b53" configVersion="7113d79cbcb5c2cac4145ac5d06f44b31e5b855d"/>
+		<Metadata name="Role.АР_ДоступКСервису" id="2e0d008b-9cf3-58f0-a091-9a3919bc6788" configVersion="b836fdba9075352ead26ee36605bb92d65ce9cdc"/>
+		<Metadata name="Role.АР_ДоступКСервису.Rights" id="2e0d008b-9cf3-58f0-a091-9a3919bc6788.0" configVersion="79bb478bd0463eb6682d9b24f0f123b25ef2fa25"/>
+	</ConfigVersions>
+</ConfigDumpInfo>
