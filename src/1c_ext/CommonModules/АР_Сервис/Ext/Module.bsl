@@ -143,11 +143,11 @@
 	Ресурсы = Новый Массив;
 	Ресурсы.Добавить(Ресурс("/v1/dim/students", "asOf, cursor, limit",
 		"student_id, book_number, program_id, group_code, faculty, study_form, basis, gender, birth_date, region, hostel, privilege, state"));
-	Ресурсы.Добавить(Ресурс("/v1/dim/programs", "cursor, limit", "program_id, title, faculty, study_form, year"));
+	Ресурсы.Добавить(Ресурс("/v1/dim/programs", "cursor, limit", "program_id, title, faculty, study_form, year, hours_per_credit"));
 	Ресурсы.Добавить(Ресурс("/v1/dim/disciplines", "cursor, limit",
-		"discipline_id, title, plan_key, program_id, semester, control_type, unit, credits, amount"));
+		"program_id, discipline_id, discipline_title, row_id, semester, load_type, unit, amount, credits"));
 	Ресурсы.Добавить(Ресурс("/v1/fact/movements", "dateFrom, dateTo, cursor, limit",
-		"student_id, book_number, order_type, order_kind, reason, order_date, effective_date, program_id, group_code, entered_at"));
+		"student_id, book_number, order_type, order_kind, analytics, reason, order_date, effective_date, program_id, group_code, entered_at"));
 	Ресурсы.Добавить(Ресурс("/v1/fact/grades", "dateFrom, dateTo, cursor, limit",
 		"student_id, book_number, program_id, discipline_id, discipline_title, semester, control_type, attempt_no, grade, absent, exam_date, entered_at, event_id"));
 	Ресурсы.Добавить(Ресурс("/v1/fact/debts", "dateFrom, dateTo, cursor, limit",
@@ -155,7 +155,7 @@
 	Ресурсы.Добавить(Ресурс("/v1/fact/finance", "dateFrom, dateTo, cursor, limit",
 		"student_id, contract_id, amount, paid_date, accrual_date, overdue_days, entered_at, event_id"));
 	Ресурсы.Добавить(Ресурс("/v1/fact/load", "cursor, limit",
-		"program_id, plan_key, semester, n_disciplines, n_exams, n_tests, n_course_projects, credits"));
+		"program_id, semester, n_disciplines, hours, n_exams, n_tests, n_course_works, hours_per_credit, credits, credits_source"));
 	Ресурсы.Добавить(Ресурс("/v1/events", "dateFrom, dateTo, cursor, limit",
 		"event_id, kind, student_id, occurred_at, payload"));
 	Ресурсы.Добавить(Ресурс("/v1/mapping/students-books", "asOf, cursor, limit",
@@ -174,7 +174,7 @@
 	Примечания.Добавить("state справочное поле текущего состояния, для обучения моделей непригодно");
 	Примечания.Добавить("entered_at пустое: дата внесения записи в источниках отсутствует, хвост отсекается запаздыванием на стороне приемника");
 	Примечания.Добавить("hostel, privilege пустые: в источниках не ведутся");
-	Примечания.Добавить("program_id пустое в disciplines и load: строковый ключ плана plan_key, соответствие документу учебного плана уточняется");
+	Примечания.Добавить("program_id это документ учебного плана, соединяется между студентами, дисциплинами, оценками и нагрузкой");
 	Примечания.Добавить("order_type, order_kind, grade, control_type передаются наименованиями справочников метода /v1/reference");
 	Схема.Вставить("notes", Примечания);
 
@@ -204,7 +204,7 @@
 		КонецЦикла;
 		Данные.Вставить(Пара.Ключ, Элементы);
 	КонецЦикла;
-	Возврат АР_Сериализация.ОтветJSON(200, Данные);
+	Возврат АР_Сериализация.ОтветJSON(200, АР_Витрины.Оболочка(Данные, Неопределено, Неопределено));
 
 КонецФункции
 
